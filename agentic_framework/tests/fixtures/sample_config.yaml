@@ -1,0 +1,55 @@
+agent:
+  name: TestAgent
+  llm:
+    provider: ibm
+    model: granite-base
+    parameters:
+      temperature: 0.1
+  tools:
+    - http
+    - sql
+    - rag
+    - quantum
+  plan:
+    - tool: http
+      args:
+        url: "/status"
+    - tool: sql
+      args:
+        query: "SELECT name FROM users"
+    - tool: rag
+      args:
+        query: "cybersecurity"
+        top_k: 2
+    - tool: quantum
+      args:
+        circuit: bell
+        shots: 10
+
+tools:
+  http:
+    class: agentic_framework.tools.HTTPTool
+    args:
+      base_url: "https://industry-challenge.example"
+      canned_responses:
+        "https://industry-challenge.example/status": "ok"
+  sql:
+    class: agentic_framework.tools.SQLTool
+    args:
+      setup:
+        - "CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT)"
+        - "INSERT INTO users (name) VALUES ('Alice')"
+        - "INSERT INTO users (name) VALUES ('Bob')"
+  rag:
+    class: agentic_framework.tools.RAGTool
+    args:
+      documents:
+        - id: 1
+          text: "Veteran-owned cybersecurity in East Texas"
+        - id: 2
+          text: "Serving Lindale and Tyler businesses"
+  quantum:
+    class: agentic_framework.tools.QuantumTool
+    args:
+      shots: 10
+      circuit: bell

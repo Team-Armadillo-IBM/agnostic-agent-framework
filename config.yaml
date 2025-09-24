@@ -1,0 +1,54 @@
+agent:
+  name: Industry Challenge Agent
+  llm:
+    provider: ibm
+    model: granite-13b-chat-v2
+    parameters:
+      temperature: 0.1
+  tools:
+    - http
+    - sql
+    - rag
+    - quantum
+  plan:
+    - tool: http
+      args:
+        url: "/status"
+    - tool: sql
+      args:
+        query: "SELECT name FROM users"
+    - tool: rag
+      args:
+        query: "cybersecurity for Tyler"
+        top_k: 2
+    - tool: quantum
+      args:
+        circuit: bell
+
+tools:
+  http:
+    class: agentic_framework.tools.HTTPTool
+    args:
+      base_url: "https://industry-challenge.example"
+      canned_responses:
+        "https://industry-challenge.example/status": "healthy"
+  sql:
+    class: agentic_framework.tools.SQLTool
+    args:
+      setup:
+        - "CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT)"
+        - "INSERT INTO users (name) VALUES ('Lindale Services')"
+        - "INSERT INTO users (name) VALUES ('Tyler Manufacturing')"
+  rag:
+    class: agentic_framework.tools.RAGTool
+    args:
+      documents:
+        - id: 1
+          text: "Veteran-owned cybersecurity partner for Lindale and Tyler"
+        - id: 2
+          text: "Protecting East Texas rural operations with managed detection"
+  quantum:
+    class: agentic_framework.tools.QuantumTool
+    args:
+      shots: 32
+      circuit: bell

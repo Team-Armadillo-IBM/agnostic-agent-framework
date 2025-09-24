@@ -1,0 +1,2 @@
+pyyaml
+qiskit>=0.44.0; extra == "quantum"
