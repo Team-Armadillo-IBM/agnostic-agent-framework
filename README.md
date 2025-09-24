@@ -114,7 +114,7 @@ references the tool.
 The optional `DoclingTool` enriches document parsing when the
 [Docling](https://github.com/docling-project/docling) dependency is installed.
 Without Docling the tool falls back to deterministic chunking so tests remain
-hermetic. See [README_DOCILING.md](README_DOCILING.md) for usage details.
+hermetic. See [README_DOCILING.md](README_DOCLING.md) for usage details.
 
 ## License
 
