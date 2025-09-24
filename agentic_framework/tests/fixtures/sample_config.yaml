@@ -30,9 +30,9 @@ tools:
   http:
     class: agentic_framework.tools.HTTPTool
     args:
-      base_url: "https://team-collab.example"
+      base_url: "https://industry-challenge.example"
       canned_responses:
-        "https://team-collab.example/status": "ok"
+        "https://industry-challenge.example/status": "ok"
   sql:
     class: agentic_framework.tools.SQLTool
     args:
