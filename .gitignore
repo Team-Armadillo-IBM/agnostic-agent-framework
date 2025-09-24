@@ -46,7 +46,6 @@ env/
 *.log
 *.sqlite3
 *.db
-*.DS_Store
 *.pkl
 *.bak
 .cache/
@@ -65,7 +64,4 @@ coverage.xml
 # OS-specific
 Thumbs.db
 .DS_Store
-=======
-__pycache__/
-*.py[cod]
 
