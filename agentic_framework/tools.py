@@ -4,8 +4,10 @@ from __future__ import annotations
 
 import importlib
 import math
+import re
 import sqlite3
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence
 
 from .config import Config
@@ -157,6 +159,142 @@ class RAGTool(BaseTool):
         if not intersection:
             return 0.0
         return len(intersection) / math.sqrt(len(query_set) * len(doc_set) or 1)
+
+
+class DoclingTool(BaseTool):
+    """Lightweight document parser inspired by Granite Docling.
+
+    The implementation is intentionally simplistic and deterministic so that
+    tests remain fast while still exercising the contract expected by the
+    planner and executor. It accepts either raw text or a file path and
+    produces chunked content alongside basic summary and QA helpers.
+    """
+
+    _SUPPORTED_MODES = {"chunk", "summarize", "qa", "extract"}
+
+    def __init__(
+        self,
+        name: str,
+        chunk_size: int = 800,
+        overlap: int = 120,
+        default_mode: str = "chunk",
+    ):
+        super().__init__(name=name)
+        self.chunk_size = int(chunk_size)
+        self.overlap = int(overlap)
+        default_mode = default_mode.lower()
+        if default_mode not in self._SUPPORTED_MODES:
+            raise ValueError(f"Unsupported default mode '{default_mode}'")
+        self.default_mode = default_mode
+
+    def execute(
+        self,
+        text: Optional[str] = None,
+        file_path: Optional[str] = None,
+        mode: Optional[str] = None,
+        chunk_size: Optional[int] = None,
+        overlap: Optional[int] = None,
+        query: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        mode_name = (mode or self.default_mode).lower()
+        if mode_name not in self._SUPPORTED_MODES:
+            raise ValueError(f"Unsupported mode '{mode_name}'")
+
+        resolved_text = self._resolve_text(text=text, file_path=file_path)
+        if resolved_text is None:
+            return {"error": "no text or file provided"}
+
+        chunk_size = int(chunk_size or self.chunk_size)
+        overlap = int(overlap if overlap is not None else self.overlap)
+        if chunk_size <= 0:
+            raise ValueError("chunk_size must be positive")
+        if overlap < 0:
+            raise ValueError("overlap must be zero or positive")
+
+        headings = self._extract_headings(resolved_text)
+        chunks = self._chunk(resolved_text, chunk_size=chunk_size, overlap=overlap)
+
+        if mode_name == "summarize":
+            summary = self._simple_summary(chunks)
+            return {
+                "mode": mode_name,
+                "summary": summary,
+                "headings": headings,
+                "chunks": chunks[:3],
+            }
+
+        if mode_name == "qa":
+            if not query:
+                raise ValueError("query is required when mode='qa'")
+            answer_hint = self._best_match(chunks, query)
+            return {
+                "mode": mode_name,
+                "query": query,
+                "answer_hint": answer_hint,
+                "headings": headings,
+            }
+
+        # "extract" behaves the same as chunking for the stub implementation.
+        return {"mode": mode_name, "headings": headings, "chunks": chunks}
+
+    def _resolve_text(
+        self, text: Optional[str], file_path: Optional[str]
+    ) -> Optional[str]:
+        if text:
+            return text
+        if not file_path:
+            return None
+        path = Path(file_path)
+        if not path.exists():
+            return None
+        if path.suffix.lower() in {".txt", ".md"}:
+            return path.read_text(encoding="utf-8", errors="ignore")
+        return path.read_bytes().decode("utf-8", errors="ignore")
+
+    @staticmethod
+    def _extract_headings(text: str) -> List[str]:
+        pattern = r"^(#+\s.*|[A-Z][A-Za-z0-9\s]{0,50}:)$"
+        return re.findall(pattern, text, flags=re.MULTILINE)
+
+    @staticmethod
+    def _chunk(text: str, chunk_size: int, overlap: int) -> List[str]:
+        if not text:
+            return []
+        chunks: List[str] = []
+        step = max(1, chunk_size - overlap)
+        index = 0
+        text_length = len(text)
+        while index < text_length:
+            chunks.append(text[index : index + chunk_size])
+            index += step
+        return chunks
+
+    @staticmethod
+    def _best_match(chunks: List[str], query: str) -> str:
+        if not chunks:
+            return ""
+        tokens = DoclingTool._tokenise(query)
+        best_chunk = max(
+            chunks,
+            key=lambda chunk: DoclingTool._overlap_score(tokens, DoclingTool._tokenise(chunk)),
+        )
+        return best_chunk[:280]
+
+    @staticmethod
+    def _tokenise(text: str) -> List[str]:
+        return [token for token in text.lower().split() if token]
+
+    @staticmethod
+    def _overlap_score(query_tokens: List[str], doc_tokens: List[str]) -> int:
+        return len(set(query_tokens) & set(doc_tokens))
+
+    @staticmethod
+    def _simple_summary(chunks: List[str]) -> str:
+        if not chunks:
+            return ""
+        if len(chunks) == 1:
+            return chunks[0][:300]
+        return f"{chunks[0][:200]} ... {chunks[-1][-200:]}"
 
 
 class QuantumTool(BaseTool):

@@ -10,6 +10,7 @@ agent:
     - sql
     - rag
     - quantum
+    - docling
   plan:
     - tool: http
       args:
@@ -52,3 +53,9 @@ tools:
     args:
       shots: 32
       circuit: bell
+  docling:
+    class: agentic_framework.tools.DoclingTool
+    args:
+      chunk_size: 800
+      overlap: 120
+      default_mode: chunk
