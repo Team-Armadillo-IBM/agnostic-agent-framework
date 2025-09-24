@@ -19,7 +19,7 @@ agent:
         query: "SELECT name FROM users"
     - tool: rag
       args:
-        query: "cybersecurity"
+        query: "collaborative solution design"
         top_k: 2
     - tool: quantum
       args:
@@ -30,24 +30,24 @@ tools:
   http:
     class: agentic_framework.tools.HTTPTool
     args:
-      base_url: "https://irondillo.example"
+      base_url: "https://team-collab.example"
       canned_responses:
-        "https://irondillo.example/status": "ok"
+        "https://team-collab.example/status": "ok"
   sql:
     class: agentic_framework.tools.SQLTool
     args:
       setup:
         - "CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT)"
-        - "INSERT INTO users (name) VALUES ('Alice')"
-        - "INSERT INTO users (name) VALUES ('Bob')"
+        - "INSERT INTO users (name) VALUES ('Atlas Research Group')"
+        - "INSERT INTO users (name) VALUES ('Nova Field Team')"
   rag:
     class: agentic_framework.tools.RAGTool
     args:
       documents:
         - id: 1
-          text: "Veteran-owned cybersecurity in East Texas"
+          text: "Playbook for aligning cross-functional teams through iterative discovery"
         - id: 2
-          text: "Serving Lindale and Tyler businesses"
+          text: "Field report on piloting modular analytics with rotating cohorts"
   quantum:
     class: agentic_framework.tools.QuantumTool
     args:

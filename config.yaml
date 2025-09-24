@@ -1,5 +1,5 @@
 agent:
-  name: Iron Dillo Agent
+  name: Collaborative Solution Agent
   llm:
     provider: ibm
     model: granite-13b-chat-v2
@@ -19,7 +19,7 @@ agent:
         query: "SELECT name FROM users"
     - tool: rag
       args:
-        query: "cybersecurity for Tyler"
+        query: "collaborative solution design"
         top_k: 2
     - tool: quantum
       args:
@@ -29,24 +29,24 @@ tools:
   http:
     class: agentic_framework.tools.HTTPTool
     args:
-      base_url: "https://irondillo.example"
+      base_url: "https://team-collab.example"
       canned_responses:
-        "https://irondillo.example/status": "healthy"
+        "https://team-collab.example/status": "healthy"
   sql:
     class: agentic_framework.tools.SQLTool
     args:
       setup:
         - "CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT)"
-        - "INSERT INTO users (name) VALUES ('Lindale Services')"
-        - "INSERT INTO users (name) VALUES ('Tyler Manufacturing')"
+        - "INSERT INTO users (name) VALUES ('Atlas Research Group')"
+        - "INSERT INTO users (name) VALUES ('Nova Field Team')"
   rag:
     class: agentic_framework.tools.RAGTool
     args:
       documents:
         - id: 1
-          text: "Veteran-owned cybersecurity partner for Lindale and Tyler"
+          text: "Playbook for aligning cross-functional teams through iterative discovery"
         - id: 2
-          text: "Protecting East Texas rural operations with managed detection"
+          text: "Field report on piloting modular analytics with rotating cohorts"
   quantum:
     class: agentic_framework.tools.QuantumTool
     args:
