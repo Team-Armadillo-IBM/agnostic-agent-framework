@@ -49,7 +49,7 @@ extensible tool registry, and deterministic fixtures for testing.
 
 ```yaml
 agent:
-  name: Iron Dillo Agent
+  name: Industry Challenge Agent
   llm:
     provider: ibm
     model: granite-13b-chat-v2

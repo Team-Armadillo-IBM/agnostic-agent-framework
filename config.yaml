@@ -1,5 +1,5 @@
 agent:
-  name: Iron Dillo Agent
+  name: Industry Challenge Agent
   llm:
     provider: ibm
     model: granite-13b-chat-v2
@@ -29,9 +29,9 @@ tools:
   http:
     class: agentic_framework.tools.HTTPTool
     args:
-      base_url: "https://irondillo.example"
+      base_url: "https://industry-challenge.example"
       canned_responses:
-        "https://irondillo.example/status": "healthy"
+        "https://industry-challenge.example/status": "healthy"
   sql:
     class: agentic_framework.tools.SQLTool
     args:
