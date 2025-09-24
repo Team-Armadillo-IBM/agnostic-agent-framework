@@ -67,6 +67,13 @@ agent:
     - tool: sql
       args:
         query: "SELECT name FROM users"
+    - tool: rag
+      args:
+        query: "collaborative solution design"
+        top_k: 2
+    - tool: quantum
+      args:
+        circuit: bell
 ```
 
 Each tool referenced in `plan` must have a matching entry under `tools`. The
