@@ -1,68 +1,65 @@
 # Agnostic Agent Framework
 
-A minimal yet complete scaffold for experimenting with agentic workflows. The
-framework exposes a configuration driven planner → executor → reflector loop,
-an extensible tool registry, and deterministic fixtures for testing so that new
-ideas can be validated quickly.
+> A lightweight scaffold for experimenting with agentic workflows. Configure a
+planner → executor → reflector loop, wire in domain tools, and iterate quickly
+with deterministic fixtures.
 
-## Highlights
+## Why this framework?
 
-- **Model/provider agnostic.** The YAML configuration specifies the LLM
-  provider, model, and parameters—no code edits required.
-- **Config-first orchestration.** Plans, tool wiring, and runtime defaults live
-  in `config.yaml`, making it easy to swap domains or prototype new flows.
-- **Batteries included tools.** HTTP, SQL, RAG, quantum, and Docling document
-  parsing tools demonstrate how to compose external capabilities while keeping
-  the suite deterministic.
-- **LangGraph-style loop.** The planner emits step lists, the executor streams
-  through tools, and the reflector summarises each run for lightweight
-  observability.
-- **Fully tested.** A unittest harness with canned fixtures ensures changes are
-  regression safe.
+- **Model/provider agnostic.** Select your LLM provider, model, and parameters
+  exclusively through YAML configuration—no code edits required.
+- **Config-first orchestration.** `config.yaml` houses plans, tool wiring, and
+  runtime defaults so you can swap domains or prototype new flows rapidly.
+- **Extensible tool registry.** Batteries-included HTTP, SQL, RAG, quantum, and
+  Docling integrations illustrate how to compose external capabilities while
+  keeping runs deterministic.
+- **Observable loop.** The planner emits step lists, the executor streams
+  through tools, and the reflector summarises each run for quick insight.
+- **Fully tested.** A unittest harness with canned fixtures keeps regressions at
+  bay while you iterate.
 
-## Repository layout
+## Quick start
+
+### 1. Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 2. Configure the agent
+
+Edit `config.yaml` to describe your problem space. Each tool entry accepts a
+fully-qualified class path plus optional constructor arguments.
+
+### 3. Run an example loop
+
+```bash
+python -m agentic_framework.examples.sql
+```
+
+Examples reference the sample fixture configuration to ensure deterministic
+output. Swap in your own configuration path for real workloads.
+
+### 4. Execute the test suite
+
+```bash
+python -m unittest discover -s agentic_framework/tests
+```
+
+## Project layout
 
 ```
 agentic_framework/
-├── agent.py            # High-level façade that wires planner/executor/reflector
+├── agent.py            # High-level façade wiring planner/executor/reflector
 ├── config.py           # YAML loader with a minimal fallback parser
 ├── executor.py         # Streams through plan steps, timing each tool call
 ├── planner.py          # Materialises plans from configuration
 ├── reflect.py          # Summarises execution results
-├── tools.py            # Built-in tool implementations + registry helpers
+├── tools.py            # Tool implementations + registry helpers
 └── tests/              # Deterministic unit tests & fixtures
 ```
 
-Additional examples live in `agentic_framework/examples/` and can be run
-directly via `python -m ...`.
-
-## Getting started
-
-1. **Install dependencies**
-
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-2. **Review the configuration**
-
-   Update `config.yaml` to describe your domain. Tool definitions accept
-   fully-qualified class paths and optional constructor arguments.
-
-3. **Run an example loop**
-
-   ```bash
-   python -m agentic_framework.examples.sql
-   ```
-
-   Each example references the sample fixture configuration to keep output
-   deterministic. Swap in your own configuration path for real workloads.
-
-4. **Execute the test suite**
-
-   ```bash
-   python -m unittest discover -s agentic_framework/tests
-   ```
+Additional runnable samples live in `agentic_framework/examples/`.
 
 ## Configuration primer
 
@@ -97,24 +94,31 @@ agent:
 ```
 
 Each tool referenced in `plan` must have a matching entry under `tools`. The
-framework resolves tool classes dynamically and caches instances across steps.
+executor resolves tool classes dynamically and caches instances across steps.
 
-### Adding new tools
+### Adding a new tool
 
-1. Implement a subclass of `BaseTool` with an `execute` method.
-2. Expose it via a fully-qualified path (for example `my_package.tools.CustomTool`).
-3. Update the YAML configuration with the tool definition and any constructor
-   arguments.
+1. Subclass `BaseTool` and implement `execute`.
+2. Expose the class via a fully-qualified path (for example
+   `my_package.tools.CustomTool`).
+3. Update `config.yaml` with the tool definition and constructor arguments.
 
-The executor will automatically resolve the class the next time a plan step
-references the tool.
+The executor will resolve the class the next time a plan step references the
+tool.
 
 ### Docling integration
 
-The optional `DoclingTool` enriches document parsing when the
+The optional Docling adapter enriches document parsing when the
 [Docling](https://github.com/docling-project/docling) dependency is installed.
 Without Docling the tool falls back to deterministic chunking so tests remain
 hermetic. See [README_DOCLING.md](README_DOCLING.md) for usage details.
+
+## Development tips
+
+- Adjust logging levels via standard Python logging configuration to surface
+  executor timing information.
+- Extend the unit tests in `agentic_framework/tests/` when adding new tools or
+  planner heuristics to preserve deterministic behaviour.
 
 ## License
 
