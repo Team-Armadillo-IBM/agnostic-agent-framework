@@ -123,3 +123,7 @@ hermetic. See [README_DOCLING.md](README_DOCLING.md) for usage details.
 ## License
 
 Apache 2.0. See [LICENSE](LICENSE) for details.
+
+## Credits
+
+- Kristopher McCoy, Technical/Team Lead — Initiated the framework to provide an adaptable foundation when the team had not yet selected a topic.
