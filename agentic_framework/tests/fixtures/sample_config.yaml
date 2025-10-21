@@ -9,7 +9,6 @@ agent:
     - http
     - sql
     - rag
-    - quantum
   plan:
     - tool: http
       args:
@@ -21,10 +20,6 @@ agent:
       args:
         query: "collaborative solution design"
         top_k: 2
-    - tool: quantum
-      args:
-        circuit: bell
-        shots: 10
 
 tools:
   http:
@@ -48,8 +43,3 @@ tools:
           text: "Playbook for aligning cross-functional teams through iterative discovery"
         - id: 2
           text: "Field report on piloting modular analytics with rotating cohorts"
-  quantum:
-    class: agentic_framework.tools.QuantumTool
-    args:
-      shots: 10
-      circuit: bell
