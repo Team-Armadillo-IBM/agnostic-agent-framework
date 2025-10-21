@@ -10,8 +10,8 @@ with deterministic fixtures.
   exclusively through YAML configuration—no code edits required.
 - **Config-first orchestration.** `config.yaml` houses plans, tool wiring, and
   runtime defaults so you can swap domains or prototype new flows rapidly.
-- **Extensible tool registry.** Batteries-included HTTP, SQL, RAG, quantum, and
-  Docling integrations illustrate how to compose external capabilities while
+- **Extensible tool registry.** Batteries-included HTTP, SQL, RAG, and Docling
+  integrations illustrate how to compose external capabilities while
   keeping runs deterministic.
 - **Observable loop.** The planner emits step lists, the executor streams
   through tools, and the reflector summarises each run for quick insight.
@@ -75,7 +75,6 @@ agent:
     - http
     - sql
     - rag
-    - quantum
     - docling
   plan:
     - tool: http
@@ -88,9 +87,6 @@ agent:
       args:
         query: "collaborative solution design"
         top_k: 2
-    - tool: quantum
-      args:
-        circuit: bell
 ```
 
 Each tool referenced in `plan` must have a matching entry under `tools`. The
