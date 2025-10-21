@@ -12,7 +12,6 @@ from .reflect import Reflector
 from .tools import (
     BaseTool,
     HTTPTool,
-    QuantumTool,
     RAGTool,
     SQLTool,
     ToolRegistry,
@@ -27,7 +26,6 @@ __all__ = [
     "Reflector",
     "BaseTool",
     "HTTPTool",
-    "QuantumTool",
     "RAGTool",
     "SQLTool",
     "ToolRegistry",

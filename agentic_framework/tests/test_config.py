@@ -25,7 +25,7 @@ class ConfigTests(unittest.TestCase):
 
     def test_plan_roundtrip(self):
         plan = self.config.plan()
-        self.assertEqual(len(plan), 4)
+        self.assertEqual(len(plan), 3)
         self.assertEqual(plan[0]["tool"], "http")
 
 

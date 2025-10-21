@@ -57,15 +57,6 @@ def _split_sections_from_text(text: str) -> List[Dict[str, str]]:
 
 from .config import Config
 
-try:  # pragma: no cover - optional dependency
-    from qiskit import Aer, QuantumCircuit, execute
-except Exception:  # pragma: no cover - gracefully degrade if qiskit is absent
-    Aer = None
-    QuantumCircuit = None
-
-    def execute(*_args: Any, **_kwargs: Any) -> Any:
-        raise RuntimeError("qiskit is not available in this environment")
-
 
 class ToolRegistry:
     """Instantiate and cache tools defined in the configuration."""
@@ -664,38 +655,3 @@ class DoclingTool(BaseTool):
         return f"{chunks[0][:200]} ... {chunks[-1][-200:]}"
 
 
-class QuantumTool(BaseTool):
-    """Wrapper around qiskit with a graceful fallback when unavailable."""
-
-    def __init__(self, name: str, shots: int = 1024, circuit: Optional[Any] = None):
-        super().__init__(name=name)
-        self.shots = shots
-        self.default_circuit = circuit or "bell"
-
-    def execute(
-        self, circuit: Optional[Any] = None, shots: Optional[int] = None
-    ) -> Dict[str, Any]:
-        circuit = circuit or self.default_circuit
-        shots = shots or self.shots
-        if QuantumCircuit is None:
-            return {"counts": {"00": shots}, "backend": "fallback"}
-
-        qc = self._ensure_circuit(circuit)
-        backend = Aer.get_backend("aer_simulator")
-        job = execute(qc, backend, shots=shots)
-        result = job.result()
-        counts = result.get_counts()
-        return {"counts": counts, "backend": backend.name()}
-
-    def _ensure_circuit(self, circuit: Any) -> "QuantumCircuit":
-        if isinstance(circuit, QuantumCircuit):
-            return circuit
-        if isinstance(circuit, str):
-            if circuit == "bell":
-                qc = QuantumCircuit(2, 2)
-                qc.h(0)
-                qc.cx(0, 1)
-                qc.measure([0, 1], [0, 1])
-                return qc
-            raise ValueError(f"Unknown circuit template '{circuit}'")
-        raise TypeError("Circuit must be a QuantumCircuit instance or template name")
